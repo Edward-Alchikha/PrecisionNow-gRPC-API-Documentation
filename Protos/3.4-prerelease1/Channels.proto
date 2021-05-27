@@ -1,0 +1,106 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "PrecisionNow.Protos";
+
+// read operations stream back, write operations are unary
+service Channels {
+  rpc GetChannels (google.protobuf.Empty) returns (stream GetChannelsDataEvent);
+  rpc ReadChannel (ReadChannelRequest) returns (stream ChannelDataEvent);
+
+  rpc CreateChannel (SchemaDefinition) returns (google.protobuf.Empty);
+  rpc WriteChannel (WriteChannelRequest) returns (google.protobuf.Empty); // unary for gRPC-Web
+  rpc DeleteChannel (ChannelName) returns (google.protobuf.Empty);
+}
+
+enum DataEventType {
+  Add = 0;
+  Clear = 1;
+  Update = 2;
+  Delete = 3;
+  DatabaseEnd = 4;
+  Info = 5;
+}
+
+message WriteChannelRequest {
+  string ChannelName = 1;
+  ChannelDataEvent Data = 2;
+}
+
+message ReadChannelRequest {
+
+  message AttributeOptions {
+    string Name = 1;
+    string NameAs = 2;
+    bool FilterNulls = 3;
+    oneof Min {
+      int64 LongMin = 4;
+      double DoubleMin = 5;
+    }
+    oneof Max {
+      int64 LongMax = 6;
+      double DoubleMax = 7;
+    }
+  }
+
+  message OrderByOptions {
+    string AttributeName = 1;
+    bool Descending = 2;
+  }
+
+  string ChannelName = 1;
+  int32 Last = 2;
+  int32 Skip = 3;
+  int32 Take = 4;
+  int32 TargetCount = 5;
+  bool AllowPagination = 6;
+  repeated AttributeOptions Attributes = 7;
+  repeated OrderByOptions OrderBy = 8;
+}
+
+message ChannelDataEvent {
+  // the format of the data should already be known and shouldn't need
+  // to be returned here since the data format should match what was requested
+  // and the caller already has the request
+  message ChannelData {
+    int32 Count = 1;
+    bytes Data = 2;
+  }
+
+  DataEventType Event = 1;
+  ChannelData Data = 2;
+  repeated int64 IDs = 3;
+}
+
+message GetChannelsDataEvent {
+  DataEventType Event = 1;
+  repeated SchemaDefinition Data = 2;
+}
+
+message ChannelName {
+  string ChannelName = 1;
+}
+
+message SchemaDefinition {
+  string TableName = 1;
+  string TableType = 2;
+  repeated AttributeParams AttributeDefinitions = 3;
+  optional int32 Count = 4;
+  optional string TableNamePrivate = 5;
+}
+
+message AttributeParams {
+  string AttributeName = 1;
+  string AttributeTypeName = 2;
+  Unit Unit = 3;
+  optional bool IsIndexed = 4;
+  optional bool IsUnique = 5;
+}
+
+message Unit {
+  string UnitType = 1;
+  string Symbol = 2;
+  double BaseUnitConversionMultiplier = 3;
+  double BaseUnitConversionOffset = 4;
+}

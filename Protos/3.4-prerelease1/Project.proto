@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "PrecisionNow.Protos";
+
+service Project {
+  rpc OpenProject (OpenProjectRequest) returns (google.protobuf.Empty);
+  rpc NewProject (NewProjectRequest) returns (google.protobuf.Empty);
+  rpc ProjectPath (google.protobuf.Empty) returns (stream ProjectChangedEvent);
+  rpc OpenGuiClient (google.protobuf.Empty) returns (google.protobuf.Empty);
+}
+
+message OpenProjectRequest {
+  string ProjectPath = 1;
+}
+
+message NewProjectRequest {
+  string ProjectPath = 1;
+}
+
+message ProjectChangedEvent {
+  string ProjectPath = 1;
+}

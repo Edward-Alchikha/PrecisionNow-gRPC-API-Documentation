@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option csharp_namespace = "PrecisionNow.Protos";
+
+service Modules {
+  rpc RunOnce (google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc Run (google.protobuf.Empty) returns (google.protobuf.Empty);
+  rpc Stop (google.protobuf.Empty) returns (google.protobuf.Empty);
+}
