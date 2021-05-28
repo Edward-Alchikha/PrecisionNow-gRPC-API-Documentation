@@ -1,0 +1,1 @@
+This was the original demo of the gRPC API. This demo is built to work with dDock 3.4-prerelease1. You must replace the existing reference to PrecisionNow.dll to its location on your machine in the dDesk/dDock "Program Files" directory.
